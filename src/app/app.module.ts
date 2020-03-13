@@ -6,13 +6,15 @@ import { AppComponent } from './app.component';
 import { MainLayoutComponent } from './main-layout/main-layout.component';
 import { HomePageComponent } from './home-page/home-page.component';
 import { PlayerComponent } from './player/player.component';
+import { UrlPipe } from './pipes/url.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
     MainLayoutComponent,
     HomePageComponent,
-    PlayerComponent
+    PlayerComponent,
+    UrlPipe
   ],
   imports: [
     BrowserModule,

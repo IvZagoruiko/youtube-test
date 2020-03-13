@@ -31,8 +31,6 @@ export class PlayerComponent implements OnInit {
     } else {
       this.youtubeUrl = `${this.youtubeBaseUrl}/${this.id}`;
     }
-
-    console.log(this.youtubeUrl);
   }
 
   checkFields() {
