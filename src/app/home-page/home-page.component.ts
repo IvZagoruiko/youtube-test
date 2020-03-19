@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {PlayerType} from "../services/interfaces";
 
 @Component({
   selector: 'app-home-page',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./home-page.component.scss']
 })
 export class HomePageComponent implements OnInit {
+
+  public playerTypes = PlayerType;
 
   constructor() { }
 
