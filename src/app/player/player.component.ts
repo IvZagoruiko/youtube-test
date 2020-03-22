@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {IPlayerOutputs, ISize, PlayerType} from "../services/interfaces";
-import {defaultSize} from "../services/constants";
+import {defaultConfig, defaultSize} from "../services/constants";
 
 @Component({
   selector: 'app-player',
@@ -21,6 +21,23 @@ export class PlayerComponent implements OnInit {
   @Input()
   public size: ISize;
 
+  @Input()
+  public autoplay: boolean;
+  @Input()
+  public cc_load_policy: boolean;
+  @Input()
+  public controls: boolean;
+  @Input()
+  public disablekb: boolean;
+  @Input()
+  public fs: boolean;
+  @Input()
+  public hl: string;
+  @Input()
+  public modestbranding: boolean;
+  @Input()
+  public origin: string;
+
   private playerVars: YT.PlayerVars;
   private playerOutputs: IPlayerOutputs;
 
@@ -38,10 +55,10 @@ export class PlayerComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.checkFields();
+    this.checkRequiredFields();
 
     if (this.playerType === this.playerTypes.youtube) {
-      this.playerVars = {};
+      this.playerVars = defaultConfig;
 
       this.playerOutputs = {
         ready: this.ready,
@@ -51,9 +68,11 @@ export class PlayerComponent implements OnInit {
         error: this.error
       };
     }
+
+    this.checkFields();
   }
 
-  checkFields() {
+  checkRequiredFields() {
     if (this.playerType === undefined) {
       throw new Error('player type is required');
     }
@@ -68,6 +87,41 @@ export class PlayerComponent implements OnInit {
 
     if (!this.size) {
       this.size = defaultSize;
+    }
+  }
+
+  checkFields() {
+    if (this.autoplay !== undefined) {
+      console.log(this.autoplay);
+      this.playerVars.autoplay = this.autoplay ? 1 : 0;
+    }
+
+    if (this.cc_load_policy !== undefined) {
+      this.playerVars.cc_load_policy = this.cc_load_policy ? 1 : 0;
+    }
+
+    if (this.controls !== undefined) {
+      this.playerVars.controls = this.controls ? 2 : 0;
+    }
+
+    if (this.disablekb !== undefined) {
+      this.playerVars.disablekb = this.disablekb ? 1 : 0;
+    }
+
+    if (this.fs !== undefined) {
+      this.playerVars.fs = this.fs ? 1 : 0;
+    }
+
+    if (this.hl !== undefined) {
+      this.playerVars.hl = this.hl;
+    }
+
+    if (this.modestbranding !== undefined) {
+      this.playerVars.modestbranding = this.modestbranding ? 1 : 0;
+    }
+
+    if (this.origin !== undefined) {
+      this.playerVars.origin = this.origin;
     }
   }
 
