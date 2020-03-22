@@ -1,6 +1,6 @@
 import {Size} from "./interfaces";
 
-export const defaultSizes: Size = {
+export const defaultSize: Size = {
   width: 1024,
   height: 768
 };

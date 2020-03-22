@@ -1,5 +1,6 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {YoutubeService} from "../services/youtube.service";
+import {IPlayerConfig, IPlayerOutputs, ISize} from "../services/interfaces";
 
 @Component({
   selector: 'app-youtube-player',
@@ -12,6 +13,13 @@ export class YoutubePlayerComponent implements OnInit, AfterViewInit {
   public id: string;
   @Input()
   public caption: string;
+  @Input()
+  public size: ISize;
+  @Input()
+  public playerVars: YT.PlayerVars;
+  @Input()
+  public playerOutputs: IPlayerOutputs;
+
   @ViewChild('player')
   public playerContainer: ElementRef;
 
@@ -24,7 +32,15 @@ export class YoutubePlayerComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this._youtubeService.setupPlayer(this.playerContainer.nativeElement, this.id);
+    const config: IPlayerConfig = {
+      playerContainer: this.playerContainer.nativeElement,
+      videoId: this.id,
+      size: this.size,
+      playerVars: this.playerVars,
+      playerOutputs: this.playerOutputs
+    };
+
+    this._youtubeService.setupPlayer(config);
   }
 
 }

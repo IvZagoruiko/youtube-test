@@ -15,4 +15,8 @@ export class HomePageComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  listner(event: any) {
+    console.log(event);
+  }
+
 }

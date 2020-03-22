@@ -1,44 +1,31 @@
-import {ElementRef, Injectable} from '@angular/core';
-import {PlayerAPI, Size} from "./interfaces";
+import {Injectable} from '@angular/core';
+import {IPlayerAPI, IPlayerConfig} from "./interfaces";
 import {win, youtubePlayerRef} from "./functions";
 import {ReplaySubject} from "rxjs";
-import {defaultSizes} from "./constants";
 
 @Injectable({
   providedIn: 'root'
 })
-export class YoutubeService implements PlayerAPI {
+export class YoutubeService implements IPlayerAPI {
 
   private readonly _api: ReplaySubject<void>;
   private _apiLoaded: boolean;
 
-  get API(): ReplaySubject<void> {
-    return this._api;
-  }
-
-  set APILoaded(newValue: boolean) {
-    this._apiLoaded = newValue;
-  }
-
-  get APILoaded(): boolean {
-    return this._apiLoaded;
-  }
-
   constructor() {
     this._api = new ReplaySubject<void>(1);
-    this.APILoaded = false;
+    this._apiLoaded = false;
     this.checkAPI();
   }
 
   checkAPI(): void {
     win()['onYouTubeIframeAPIReady'] = () => {
-      this.API.next();
+      this._api.next();
     };
   }
 
   loadPlayerAPI(): void {
-    if (!this.APILoaded) {
-      this.APILoaded = true;
+    if (!this._apiLoaded) {
+      this._apiLoaded = true;
       const doc = win().document;
       const playerApiScript = doc.createElement('script');
       playerApiScript.type = 'text/javascript';
@@ -47,48 +34,40 @@ export class YoutubeService implements PlayerAPI {
     }
   }
 
-  setupPlayer(
-    playerContainer: ElementRef,
-    videoId: string,
-    size: Size = defaultSizes
-  ): void {
+  setupPlayer(config: IPlayerConfig): void {
     this._api.subscribe(() => {
-      console.log('create');
-      this.createPlayer(
-        playerContainer,
-        videoId,
-        size
-      );
+      this.createPlayer(config);
     })
   }
 
-  private createPlayer(
-    playerContainer: ElementRef,
-    videoId: string,
-    size: Size = defaultSizes
-  ): void {
+  private createPlayer(config: IPlayerConfig): void { //which methods are static
     const player = youtubePlayerRef();
-    const {width, height} = size;
-    return new player(playerContainer, {
-      width,
-      height,
-      videoId
+
+    const { width, height } = config.size;
+
+    return new player(config.playerContainer, {
+      videoId: config.videoId,
+      width: width,
+      height: height,
+      playerVars: config.playerVars,
+      events: {
+        onReady: (event: YT.PlayerEvent) => {
+          // this.zone.run(() => outputs.ready && outputs.ready.next(ev.target));
+          config.playerOutputs.ready && config.playerOutputs.ready.emit(event.target);
+        },
+        onStateChange: (event: YT.PlayerEvent) => {
+          config.playerOutputs.stateChange && config.playerOutputs.stateChange.emit(event);
+        },
+        onPlaybackQualityChange: (event: YT.PlayerEvent) => {
+          config.playerOutputs.playbackQualityChange && config.playerOutputs.playbackQualityChange.emit(event);
+        },
+        onPlaybackRateChange: (event: YT.PlayerEvent) => {
+          config.playerOutputs.playbackRateChange && config.playerOutputs.playbackRateChange.emit(event);
+        },
+        onError: (event: YT.PlayerEvent) => {
+          config.playerOutputs.error && config.playerOutputs.error.emit(event);
+        }
+      }
     });
   }
-
-  toggleFullScreen(player: YT.Player, setFullScreen: boolean): void {
-    let width: number;
-    let height: number;
-
-    if (setFullScreen) {
-      width = win().innerWidth;
-      height = win().innerHeight;
-    } else {
-      width = defaultSizes.width;
-      height = defaultSizes.height;
-    }
-
-    player.setSize(width, height);
-  }
-
 }
