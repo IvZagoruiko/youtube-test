@@ -17,13 +17,13 @@ export class YoutubeService implements IPlayerAPI {
     this.checkAPI();
   }
 
-  checkAPI(): void {
+  public checkAPI(): void {
     win()['onYouTubeIframeAPIReady'] = () => {
       this._api.next();
     };
   }
 
-  loadPlayerAPI(): void {
+  public loadPlayerAPI(): void {
     if (!this._apiLoaded) {
       this._apiLoaded = true;
       const doc = win().document;
@@ -34,7 +34,7 @@ export class YoutubeService implements IPlayerAPI {
     }
   }
 
-  setupPlayer(config: IPlayerConfig): void {
+  public setupPlayer(config: IPlayerConfig): void {
     this._api.subscribe(() => {
       this.createPlayer(config);
     })
@@ -45,7 +45,7 @@ export class YoutubeService implements IPlayerAPI {
 
     const { width, height } = config.size;
 
-    return new player(config.playerContainer, {
+    new player(config.playerContainer, {
       videoId: config.videoId,
       width: width,
       height: height,

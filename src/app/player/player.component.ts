@@ -1,6 +1,17 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {IPlayerOutputs, ISize, PlayerType} from "../services/interfaces";
-import {defaultConfig, defaultSize} from "../services/constants";
+import {
+  Autoplay,
+  Controls,
+  FullScreenButton,
+  Hl,
+  IPlayerOutputs,
+  ISize,
+  Keyboard,
+  PlayerType,
+  Subtitles,
+  YoutubeMark
+} from "../services/interfaces";
+import {defaultSize} from "../services/constants";
 
 @Component({
   selector: 'app-player',
@@ -8,8 +19,6 @@ import {defaultConfig, defaultSize} from "../services/constants";
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent implements OnInit {
-
-  public playerTypes = PlayerType;
 
   @Input()
   public playerType: PlayerType;
@@ -19,27 +28,24 @@ export class PlayerComponent implements OnInit {
   public caption: string;
 
   @Input()
-  public size: ISize;
+  public size: ISize = defaultSize;
 
   @Input()
-  public autoplay: boolean;
+  public autoplay: Autoplay = Autoplay.disable;
   @Input()
-  public cc_load_policy: boolean;
+  public cc_load_policy: Subtitles = Subtitles.enable;
   @Input()
-  public controls: boolean;
+  public controls: Controls = Controls.enable;
   @Input()
-  public disablekb: boolean;
+  public disablekb: Keyboard = Keyboard.enable;
   @Input()
-  public fs: boolean;
+  public fs: FullScreenButton = FullScreenButton.enable;
   @Input()
-  public hl: string;
+  public hl: Hl = Hl.russian;
   @Input()
-  public modestbranding: boolean;
+  public modestbranding: YoutubeMark = YoutubeMark.disable;
   @Input()
-  public origin: string;
-
-  private playerVars: YT.PlayerVars;
-  private playerOutputs: IPlayerOutputs;
+  public origin: string; /////////
 
   @Output()
   public ready: EventEmitter<YT.Player> = new EventEmitter<YT.Player>();
@@ -52,13 +58,26 @@ export class PlayerComponent implements OnInit {
   @Output()
   public error: EventEmitter<YT.PlayerEvent> = new EventEmitter<YT.PlayerEvent>();
 
+  public playerTypes = PlayerType;
+
+  public playerVars: YT.PlayerVars;
+  public playerOutputs: IPlayerOutputs;
+
   constructor() {}
 
   ngOnInit(): void {
-    this.checkRequiredFields();
+    this.checkFields();
 
     if (this.playerType === this.playerTypes.youtube) {
-      this.playerVars = defaultConfig;
+      this.playerVars = {
+        autoplay: this.autoplay as number,
+        cc_load_policy: this.cc_load_policy as number,
+        controls: this.controls as number,
+        disablekb: this.disablekb as number,
+        fs: this.fs as number,
+        hl: this.hl as string,
+        modestbranding: this.modestbranding as number
+      };
 
       this.playerOutputs = {
         ready: this.ready,
@@ -68,11 +87,9 @@ export class PlayerComponent implements OnInit {
         error: this.error
       };
     }
-
-    this.checkFields();
   }
 
-  checkRequiredFields() {
+  private checkFields(): void {
     if (this.playerType === undefined) {
       throw new Error('player type is required');
     }
@@ -84,45 +101,5 @@ export class PlayerComponent implements OnInit {
     if (!this.caption) {
       throw new Error('caption is required');
     }
-
-    if (!this.size) {
-      this.size = defaultSize;
-    }
   }
-
-  checkFields() {
-    if (this.autoplay !== undefined) {
-      console.log(this.autoplay);
-      this.playerVars.autoplay = this.autoplay ? 1 : 0;
-    }
-
-    if (this.cc_load_policy !== undefined) {
-      this.playerVars.cc_load_policy = this.cc_load_policy ? 1 : 0;
-    }
-
-    if (this.controls !== undefined) {
-      this.playerVars.controls = this.controls ? 2 : 0;
-    }
-
-    if (this.disablekb !== undefined) {
-      this.playerVars.disablekb = this.disablekb ? 1 : 0;
-    }
-
-    if (this.fs !== undefined) {
-      this.playerVars.fs = this.fs ? 1 : 0;
-    }
-
-    if (this.hl !== undefined) {
-      this.playerVars.hl = this.hl;
-    }
-
-    if (this.modestbranding !== undefined) {
-      this.playerVars.modestbranding = this.modestbranding ? 1 : 0;
-    }
-
-    if (this.origin !== undefined) {
-      this.playerVars.origin = this.origin;
-    }
-  }
-
 }
